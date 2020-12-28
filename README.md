@@ -12,6 +12,5 @@ prateleira, todos os livros de uma área devem ficar juntos, e ordenados por dat
 O Professor Asdrúbal pretende minimizar o dinheiro gasto em prateleiras, de forma a que todos
 os seus livros estejam numa prateleira e fiquem organizados a seu gosto. Além disso, pretende
 saber como ficarão dispostos os seus livros pelas prateleiras.
-
 Modele este problema como um problema de otimização / satisfação de restrições e resolva-o
 em PLR de forma a ser possível satisfazer problemas desta classe com diferentes parâmetros.
