@@ -1,5 +1,22 @@
 :- use_module(library(clpfd)).
 
+teste :-
+		asdrubal( [3, 5, 6, 6, 1, 2],
+				  [3, 5, 6, 7, 6, 6],
+				  [6, 6, 6, 6, 10, 3],
+				  [1, 2, 3, 1, 0, 1],
+				  [3, 1, 2, 2, 2, 1, 1, 1],
+				  [3, 3, 4, 2, 4, 6, 3, 1],
+				  [4, 2, 1, 3, 4 ,3 ,2, 4],
+				  [1991, 2002, 2010, 2003, 2007, 2006, 1999, 1991],
+				  DinheiroGasto, QuantidadeDasPrateleirasCompradas, ListaDosLivrosDispostosEmCadaPrateleiraComprada).
+				  %Espera-se obter:
+				  %DinheiroGasto = 10
+				  %QuantidadeDasPrateleirasCompradas = [0, 0, 1, 1, 0]
+				  %ListaDosLivrosDispostosEmCadaPrateleiraComprada = [ 3-[3,7,2,4,6], 4-[1,8,5] ]
+				  %																  OU  4-[8,1,5]
+		
+
 %O predicado principal para resolver o problema terá a seguinte estrutura:
 % 				asdrubal(+CustosDasPrateleiras, +LargurasDasPrateleiras, +AlturasDasPrateleiras, +EstoqueDasPrateleiras, 
 %						 +LargurasDosLivros, +AlturasDosLivros, +TemasDosLivros, +DataDePubDosLivros,
@@ -22,7 +39,7 @@ asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, Es
 				
 				
 				%Dominio das Variáveis de output
-				dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, QtdeTotalPrateleiras).
+				dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, QtdeTotalPrateleiras),
 				
 				
 				%O tamanho de ListaDosLivrosDispostosEmCadaPrateleiraComprada tem que ser igual a quantidade de prateleiras compradas
@@ -37,7 +54,7 @@ asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, Es
 				scalar_product(CustosDasPrateleiras, QuantidadesDasPrateleirasCompradas, #=, DinheiroGasto),
 				
 				%Pesquisa no labeling
-				append(DinheiroGasto, QuantidadesDasPrateleirasCompradas, VarsTmp),
+				append([DinheiroGasto], QuantidadesDasPrateleirasCompradas, VarsTmp),
 				append(VarsTmp, ListaDosLivrosDispostosEmCadaPrateleiraComprada, Vars),
 				labeling([minimize(DinheiroGasto)], Vars),
 				
