@@ -43,8 +43,12 @@ asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, Es
 				
 				
 				%O tamanho de ListaDosLivrosDispostosEmCadaPrateleiraComprada tem que ser igual a quantidade de prateleiras compradas
-				length(ListaDosLivrosDispostosEmCadaPrateleiraComprada, QtdeDasPrateleirasCompradas),
 				sum(QuantidadesDasPrateleirasCompradas, #=, QtdeDasPrateleirasCompradas),
+				length(ListaDosLivrosDispostosEmCadaPrateleiraComprada, QtdeDasPrateleirasCompradas),
+				
+				
+				
+				
 				
 				
 				
@@ -67,10 +71,11 @@ asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, Es
 		
 %A quantidade comprada de cada prateleira varia entre 0 e o estoque máximo daquele tipo de prateleira		
 dominioPrateleirasCompradas( _, _, 0).
-dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, Index) :- 
-								element(Index, EstoqueDasPrateleiras, QtdeEstoque),
-								element(Index, QuantidadesDasPrateleirasCompradas, QtdeComprada),
-								domain([QtdeComprada], 0, QtdeEstoque).
-				
+dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, Indice) :- 
+								element(Indice, EstoqueDasPrateleiras, QtdeEstoque),
+								element(Indice, QuantidadesDasPrateleirasCompradas, QtdeComprada),
+								domain([QtdeComprada], 0, QtdeEstoque),
+								NovoIndice is Indice - 1,
+								dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, NovoIndice).
 				
 
