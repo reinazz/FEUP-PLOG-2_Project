@@ -40,7 +40,7 @@ aux_int(Input):-
     aux2_int(Char1, Char2, Input).
 
 % code do Char2 = 10 por exemplo '\n' ou seja, caso de numero de 1 digito
-aux_aux_int(Char1, 10, Input):-
+aux2_int(Char1, 10, Input):-
     Input is Char1 - 48.
 
 %  caso de numero de 2 digitos
