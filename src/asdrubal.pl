@@ -3,11 +3,13 @@
 :- use_module(library(random)).
 :- use_module(library(file_systems)).
 
+/*revisão nota tele móvel
 
-%Sistema de Ficheiros
+to do */
+%Sistema de Ficheiros -> para revisão 
 file_Path(FilePath):-
     current_directory(Dir),
-    atom_concat(Dir, 'asdrubal.pl', FilePath).
+    atom_concat(Dir, 'test.pl', FilePath).
 
 guardarLivros(Lista_Livros, Nome_Lista):-
     file_Path(Path_Livros),
@@ -30,13 +32,16 @@ guardarPrateleiras(Lista_Prateleiras, Nome_Lista):-
     close(Stream),
     write(Nome_Lista), write(' gravada com sucesso no directorio: '), write(Path_Prateleiras), nl, nl,
     reconsult(Path_Prateleiras).
-%Sistema de ficheiros -> Fim
+%Sistema de ficheiros -> Fim -> para revisão 
 
 %Auxiliares para input handling
 %aux_int(-Input) -> recebe um número de até 2 dígitos para input
+%limitar n digitos
 aux_int(Input):-
-    get_code(Char1),
+	get_code(Char1),
     get_code(Char2),
+	Char1 > 47,
+	Char1 < 58,
     aux2_int(Char1, Char2, Input).
 
 % code do Char2 = 10 por exemplo '\n' ou seja, caso de numero de 1 digito
@@ -45,6 +50,8 @@ aux2_int( Char1, 10, Input):-
 
 %  caso de numero de 2 digitos
 aux2_int( Char1, Char2, Input):-
+	Char2 > 47,
+	Char2 < 58,
     Digit1 is Char1 - 48,
     Digit2 is Char2 - 48,
     Temp is Digit1 * 10,
@@ -87,10 +94,26 @@ pff_enter:-
 	get_char(_), !.
 
 %Auxiliares de interface -> FIM
+%gerador de livros -> just for test atm
+gerador_livros(Input, Lista_Livros):-
+	guardarLivros( [[3, 1, 2, 2, 2, 1, 1, 1], 
+					[3, 3, 4, 2, 4, 6, 3, 1], 
+					[4, 2, 1, 3, 4 ,3 ,2, 4], 
+					[1991, 2002, 2010, 2003, 2007, 2006, 1999, 1991] ] , 'livros'),
+write('Por implementar \n ').
 
 
-%Menus
-menu_main:-
+
+gerador_prateleiras(Input, Lista_Prateleiras):-			
+	guardarPrateleiras([[3, 5, 6, 6, 1, 2], 
+						[3, 5, 6, 7, 6, 6], 
+						[6, 6, 6, 6, 10, 3],
+						[1, 2, 3, 1, 0, 1]	] , 'prateleiras'),
+write('Por implementar \n ').
+%geradores, test phase
+
+
+menu_main:-          
 	print_main,
 	aux_int(Input),
 	main_option(Input).
@@ -101,19 +124,19 @@ main_option(1):-
 main_option(2):- 
 	write('\n Por favor indique quantos livros deseja gerar: \n'),
 	aux_int(Input),
-	gerador_livros(Input).
+	gerador_livros(Input, Lista_Prateleiras).
 	
 main_option(3):- 
 	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
 	aux_int(Input),
-	gerador_prateleiras(Input).
+	gerador_prateleiras(Input, Lista_Prateleiras).
 	
 main_option(4):- 
 	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
 	aux_int(Input1),
 	write('\n Por favor indique quantos livros deseja gerar: \n'),
 	aux_int(Input2),
-	gerador_prateleiras(Input1), gerador_livros(Input2).
+	gerador_prateleiras(Input1, Lista_Prateleiras), gerador_livros(Input2, Lista_Livros).
 	
 %Termina o programa
 main_option(5).
@@ -138,8 +161,6 @@ print_main:-
 	write('==================================\n'),
 	write('Escolha a opção pretendida:\t').
 %Menus -> Fim
-
-
 
 
 
