@@ -40,13 +40,13 @@ aux_int(Input):-
     aux2_int(Char1, Char2, Input).
 
 % code do Char2 = 10 por exemplo '\n' ou seja, caso de numero de 1 digito
-aux2_int(Char1, 10, Input):-
+aux2_int( Char1, 10, Input):-
     Input is Char1 - 48.
 
 %  caso de numero de 2 digitos
-aux2_int(Char1, Char2, Input):-
-    FirstDigit is Char1 - 48,
-    SecondDigit is Char2 - 48,
+aux2_int( Char1, Char2, Input):-
+    Digit1 is Char1 - 48,
+    Digit2 is Char2 - 48,
     Temp is Digit1 * 10,
     Input is Temp + Digit2,
     get_char(_).
@@ -189,15 +189,10 @@ asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, Es
 				%O tamanho de ListaDosLivrosDispostosEmCadaPrateleiraComprada tem que ser igual a quantidade de prateleiras compradas
 				sum(QuantidadesDasPrateleirasCompradas, #=, QtdeDasPrateleirasCompradas),
 				length(ListaDosLivrosDispostosEmCadaPrateleiraComprada, QtdeDasPrateleirasCompradas),
-
+				
 				%Altura do livro mais alto de um dado tema será o primeiro factor restritivo para a aquisição da prateleira correspondente
 				%Somatório das larguras dos livros definem o comprimento de prateleira necessário, sendo que se deve comparar o preço de 1 que tenha o comprimento necessário com a soma de N prateleiras mais pequenas que juntas cheguem para arrumar os lvros
 				%Por outro lado, se uma prateleira não for ocupada na totalidade, o espaço que resta deve ser tratado como uma "nova" prateleira de custo 0 vs Fazer a relação de preço/comprimento para definir o custo da "nova" sendo este subtraído ao da prateleira "Mãe" -> dependerá do professor
-				
-				
-				
-				
-
 				
 		
 				%Determinar o dinheiro gasto nas compras
@@ -223,6 +218,6 @@ dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPratel
 								domain([QtdeComprada], 0, QtdeEstoque),
 								NovoIndice is Indice - 1,
 								dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, NovoIndice).
-
+				
 				
 
