@@ -40,7 +40,7 @@ aux_int(Input):-
     aux2_int(Char1, Char2, Input).
 
 % code do Char2 = 10 por exemplo '\n' ou seja, caso de numero de 1 digito
-aux_get_int(Char1, 10, Input):-
+aux_aux_int(Char1, 10, Input):-
     Input is Char1 - 48.
 
 %  caso de numero de 2 digitos
@@ -92,7 +92,7 @@ pff_enter:-
 %Menus
 menu_main:-
 	print_main,
-	get_int(Input),
+	aux_int(Input),
 	main_option(Input).
 
 main_option(1):- 
@@ -100,19 +100,19 @@ main_option(1):-
 
 main_option(2):- 
 	write('\n Por favor indique quantos livros deseja gerar: \n'),
-	get_int(Input),
+	aux_int(Input),
 	gerador_livros(Input).
 	
 main_option(3):- 
 	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
-	get_int(Input),
+	aux_int(Input),
 	gerador_prateleiras(Input).
 	
 main_option(4):- 
 	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
-	get_int(Input1),
+	aux_int(Input1),
 	write('\n Por favor indique quantos livros deseja gerar: \n'),
-	get_int(Input2),
+	aux_int(Input2),
 	gerador_prateleiras(Input1), gerador_livros(Input2).
 	
 %Termina o programa
@@ -191,7 +191,8 @@ asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, Es
 				length(ListaDosLivrosDispostosEmCadaPrateleiraComprada, QtdeDasPrateleirasCompradas),
 				%Altura do livro mais alto de um dado tema será o primeiro factor restritivo para a aquisição da prateleira correspondente
 				%Somatório das larguras dos livros definem o comprimento de prateleira necessário, sendo que se deve comparar o preço de 1 que tenha o comprimento necessário com a soma de N prateleiras mais pequenas que juntas cheguem para arrumar os lvros
-				%Por outro lado, se uma prateleira não for ocupada na totalidade, o espaço que resta deve ser tratado como uma "nova" prateleira de custo 0 vs Fazer a relação de preço/comprimento para definir o custo da "nova" sendo este subtraído ao da prateleira "Mãe"
+				%Por outro lado, se uma prateleira não for ocupada na totalidade, o espaço que resta deve ser tratado como uma "nova" prateleira de custo 0 vs Fazer a relação de preço/comprimento para definir o custo da "nova" sendo este subtraído ao da prateleira "Mãe" -> dependerá do professor
+				
 		
 				%Determinar o dinheiro gasto nas compras
 				scalar_product(CustosDasPrateleiras, QuantidadesDasPrateleirasCompradas, #=, DinheiroGasto),
