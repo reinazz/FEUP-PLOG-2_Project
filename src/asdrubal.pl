@@ -51,6 +51,14 @@ input_int(Input):-
 aux_int( Char1, 10, Input):-
     Input is Char1 - 48.
 
+
+%prevenir contra a possibilidade de estar um \n na input Stream
+aux_int( 10, Char2, Input):-
+    write('\n So pa testar \t'),
+    input_int(Input).
+
+
+
 %  caso de numero de 2 digitos
 aux_int( Char1, Char2, Input):-
 	Char2 > 47,
@@ -61,12 +69,26 @@ aux_int( Char1, Char2, Input):-
     Input is Temp + Digit2,
     get_char(_).
 
-%Handler para o menu principal que garante que os inputs de limite inferior não ultrapassamn os de limite superior, voltando ao menu inicial
+%Handler para o menu principal que garante que os inputs de limite inferior não ultrapassamn os de limite superior
 limit_handler(Inferior, Superior):-
+	Inferior < Superior -> ! ;
+	limit_handler(Inferior, Superior, NovoInf, NovoSup).
+
+limit_handler(Inferior, Superior, NovoInf, NovoSup):-
+	Inferior < Superior -> ! ;
 	Inferior > Superior,
-	write('\n O valor mínimo não pode ser maior que o valor máximo será retornado de volta ao menu principal. \n'),
-	pff_enter,
-	menu_main.
+	format('O limite inferior ~w ultrapassa o limite superior ~w2. Por favor indique novos limites: ~t', [Inferior, Superior]),
+	write('\n A largura minima desejada: \t'),
+	input_int(NovoInf),
+	format(' escolheu ~w como largura minima ~n', NovoInf),
+	write('\n A largura maxima desejada: \t'),
+	input_int(NovoSup),
+	format('~n escolheu ~w como largura maxima ~t', NovoSup),
+	Inferior is NovoInf,
+	Superior is NovoSup,
+	limit_handler(NovoInf, NovoSup). 
+
+	
 	
 	
 
@@ -103,7 +125,7 @@ limpa(N):-
 %pff_enter -> Pede ao utilizador que carregue na tecla enter
 
 pff_enter:-
-	write('Por favor pressione a tecla <Enter> para continuar.\n'),
+	write('\n Por favor pressione a tecla <Enter> para continuar.\n'),
 	get_char(_), !.
 
 %Auxiliares de interface -> FIM
@@ -131,11 +153,13 @@ menu_main:-
 	input_int(Input),
 	main_option(Input).
 
+
 main_option(1):- 
 	print_info_geracao,
 	fazer_prateleiras,
 	fazer_livros,
 	write('\n Estes são os dados do problema que será agora resolvido da melhor forma possível: \n '),
+	%mostrar problema
 	pff_enter.
 
 
@@ -149,6 +173,7 @@ main_option(_):-
 	pff_enter,
 	menu_main.
 
+
 print_main:-
 	limpa,
 	write('===================================\n'),
@@ -159,7 +184,15 @@ print_main:-
 	write('| 2. Sair                         |\n'),
 	write('|                                 |\n'),
 	write('===================================\n'),
-	write('Escolha a opção pretendida:\t').
+	write('Escolha a opção pretendida: \t').
+
+
+
+
+
+
+
+
 print_info_geracao:-
     write('\n ================== Menu de geração do problema ===================== \n'),
 	write('\n  |       De seguida tera a oportunidade de gerar                  | \n'),
@@ -170,49 +203,54 @@ print_info_geracao:-
 	write('\n  |       valores máximos para cada parametro, se o fizer será     | \n'),
 	write('\n  |       enviado de volta para o  menu principal.                 | \n'),
 	write('\n =================================================================== \n'),
-	pff_enter,
-	limpa. 	
+	pff_enter.
+
 
 fazer_prateleiras:-
+    limpa,
 	write('\n ========= Gerador de Prateleiras ========== \n'),
-	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
+	write('\n Por favor indique quantas prateleiras deseja gerar: \t'),
 	input_int(P_Input1),
 	write('\n Sobre as prateleiras, por favor, indique: \n'),
-	write('\n A largura mínima desejada: \n'),
+	write('\n A largura mínima desejada: \t'),
 	input_int(P_Input2),
-	write('\n A largura máxima desejada: \n'),
+	format(' escolheu ~w como largura minima ~n', P_Input2),
+	write('\n A largura máxima desejada: \t'),
 	input_int(P_Input3),
+	format(' escolheu ~w como largura maxima ~n', P_Input3),
 	limit_handler(P_Input2, P_Input3),
-	write('\n A altura mínima permitida: \n'),
+	write('\n A altura mínima permitida: \t'),
 	input_int(P_Input4),
-	write('\n A altura máxima pretendida:  \n'),
+	write('\n A altura máxima pretendida:  \t'),
 	input_int(P_Input5),
 	limit_handler(P_Input4, P_Input5),
-	write('\n O preço mínimo permitido:  \n'),
+	write('\n O preço mínimo permitido:  \t'),
 	input_int(P_Input6),
-	write('\n O preço máximo pretendido:  \n'),
+	write('\n O preço máximo pretendido:  \t'),
 	input_int(P_Input7),
 	limit_handler(P_Input6, P_Input7),
-	gerador_prateleiras(P_Input1, P_Input2, P_Input3, P_Input4, P_Input5, P_Input6, P_Input7), %Por implementar :: P1-> Numero de prateleiras, Intervalo para as larguras -> [P2, P3], Intervalo para as alturas -> [P4, P5], Intervalo para os preços -> [P6, P7]
-	limpa.
+	%gerador_prateleiras(P_Input1, P_Input2, P_Input3, P_Input4, P_Input5, P_Input6, P_Input7), %Por implementar :: P1-> Numero de prateleiras, Intervalo para as larguras -> [P2, P3], Intervalo para as alturas -> [P4, P5], Intervalo para os preços -> [P6, P7]
+	write('\n sucesso \t').
 
 fazer_livros:-
-	write('\n ========= Gerador de Livros ========== \n'),
-	write('\n Por favor indique quantos livros deseja gerar: \n'),
+    limpa,
+	write('\n ========= Gerador de Livros ========== \t'),
+	write('\n Por favor indique quantos livros deseja gerar: \t'),
 	input_int(L_Input1),
 	write('\n Sobre os livros a serem gerados, por favor, indique: \n'),
-	write('\n A largura mínima desejada: \n'),
+	write('\n A largura mínima desejada: \t'),
 	input_int(L_Input2),
-	write('\n A largura máxima desejada: \n'),
+	write('\n A largura máxima desejada: \t'),
 	input_int(L_Input3),
 	limit_handler(L_Input2, L_Input3),
-	write('\n A altura mínima permitida: \n'),
+	write('\n A altura mínima permitida: \t'),
 	input_int(L_Input4),
-	write('\n A altura máxima pretendida:  \n'),
+	write('\n A altura máxima pretendida:  \t'),
 	input_int(L_Input5),
 	limit_handler(L_Input4, L_Input5),
-	gerador_livros(L_Input1, L_Input2, L_Input3, L_Input4, L_Input5), %Por implementar :: L1-> Numero de livros, Intervalo para as larguras -> [L2, L3], Intervalo para as alturas -> [L4, L5] 
-	limpa.
+	%gerador_livros(L_Input1, L_Input2, L_Input3, L_Input4, L_Input5), %Por implementar :: L1-> Numero de livros, Intervalo para as larguras -> [L2, L3], Intervalo para as alturas -> [L4, L5] 
+	write('\n sucesso \t').
+
 %Menus -> Fim
 
 
