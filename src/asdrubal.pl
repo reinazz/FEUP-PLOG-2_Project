@@ -3,13 +3,12 @@
 :- use_module(library(random)).
 :- use_module(library(file_systems)).
 
-/*revisão nota tele móvel
 
-to do */
+/*
 %Sistema de Ficheiros -> para revisão 
 file_Path(FilePath):-
     current_directory(Dir),
-    atom_concat(Dir, 'test.pl', FilePath).
+    atom_concat(Dir, 'asdrubal.pl', FilePath).
 
 guardarLivros(Lista_Livros, Nome_Lista):-
     file_Path(Path_Livros),
@@ -32,24 +31,28 @@ guardarPrateleiras(Lista_Prateleiras, Nome_Lista):-
     close(Stream),
     write(Nome_Lista), write(' gravada com sucesso no directorio: '), write(Path_Prateleiras), nl, nl,
     reconsult(Path_Prateleiras).
-%Sistema de ficheiros -> Fim -> para revisão 
+%Sistema de ficheiros -> Fim -> para revisão */
+
+
+%Guardar listas de livros e prateleiras usando asserta
+
 
 %Auxiliares para input handling
-%aux_int(-Input) -> recebe um número de até 2 dígitos para input
+%input_int(-Input) -> recebe um número de até 2 dígitos para input
 %limitar n digitos
-aux_int(Input):-
+input_int(Input):-
 	get_code(Char1),
     get_code(Char2),
 	Char1 > 47,
 	Char1 < 58,
-    aux2_int(Char1, Char2, Input).
+    aux_int(Char1, Char2, Input).
 
 % code do Char2 = 10 por exemplo '\n' ou seja, caso de numero de 1 digito
-aux2_int( Char1, 10, Input):-
+aux_int( Char1, 10, Input):-
     Input is Char1 - 48.
 
 %  caso de numero de 2 digitos
-aux2_int( Char1, Char2, Input):-
+aux_int( Char1, Char2, Input):-
 	Char2 > 47,
 	Char2 < 58,
     Digit1 is Char1 - 48,
@@ -58,16 +61,26 @@ aux2_int( Char1, Char2, Input):-
     Input is Temp + Digit2,
     get_char(_).
 
+%Handler para o menu principal que garante que os inputs de limite inferior não ultrapassamn os de limite superior, voltando ao menu inicial
+limit_handler(Inferior, Superior):-
+	Inferior > Superior,
+	write('\n O valor mínimo não pode ser maior que o valor máximo será retornado de volta ao menu principal. \n'),
+	pff_enter,
+	menu_main.
+	
+	
 
-%aux_palavra(-Palavra, +Atom) -> lê characteres e gera um atomo com eles até encontrar '\n'
+
+
+%input_palavra(-Palavra, +Atom) -> lê characteres e gera um atomo com eles até encontrar '\n'
     
-aux_palavra(Palavra, Atom):-
+input_palavra(Palavra, Atom):-
     get_char(Char),
     Char \= '\n',
     atom_concat(Acc, Char, Atom2),
-    aux_palavra(Palavra, Atom2).
+    input_palavra(Palavra, Atom2).
 
-aux_palavra(Palavra, Palavra).
+input_palavra(Palavra, Palavra).
 %Auxiliares para input handling -> Fim
 
 
@@ -75,7 +88,7 @@ aux_palavra(Palavra, Palavra).
 %limpa -> simula a limpeza da consola ao printar 100 newlines ('\n)
  
 limpa:- 
-    limpa(100), !.
+    limpa(50), !.
 
 
 %limpa(+N) -> printa N numero de newlines
@@ -115,51 +128,91 @@ write('Por implementar \n ').
 
 menu_main:-          
 	print_main,
-	aux_int(Input),
+	input_int(Input),
 	main_option(Input).
 
 main_option(1):- 
-	asdrubal(Lista_Livros, Lista_Prateleiras) .
+	print_info_geracao,
+	fazer_prateleiras,
+	fazer_livros,
+	write('\n Estes são os dados do problema que será agora resolvido da melhor forma possível: \n '),
+	pff_enter.
 
-main_option(2):- 
-	write('\n Por favor indique quantos livros deseja gerar: \n'),
-	aux_int(Input),
-	gerador_livros(Input, Lista_Prateleiras).
-	
-main_option(3):- 
-	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
-	aux_int(Input),
-	gerador_prateleiras(Input, Lista_Prateleiras).
-	
-main_option(4):- 
-	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
-	aux_int(Input1),
-	write('\n Por favor indique quantos livros deseja gerar: \n'),
-	aux_int(Input2),
-	gerador_prateleiras(Input1, Lista_Prateleiras), gerador_livros(Input2, Lista_Livros).
-	
-%Termina o programa
-main_option(5).
 
+main_option(2). %sair do programa
+	
+	
+	
 %handler de inputs inválidos
 main_option(_):- 
-	write('\n Erro, a opção escolhida não é válida, escolha uma das opções disponíveis [1, 5]. \n'),
+	write('\n Erro, a opção escolhida não é válida, escolha uma das opções disponíveis 1 ou 2. \n'),
 	pff_enter,
 	menu_main.
 
 print_main:-
 	limpa,
-	write('==================================\n'),
-	write('|Biblioteca do Professor Asdrubal|\n'),
-	write('|--------------------------------|\n'),
-	write('|                                |\n'),
-	write('| 1. Resolver problema           |\n'),
-	write('| 2. Gerar livros                |\n'),
-	write('| 3. Gerar Prateleiras           |\n'),
-	write('| 4. Gerar Prateleiras e Livros  |\n'),
-	write('| 5. Sair                        |\n'),
-	write('==================================\n'),
+	write('===================================\n'),
+	write('|Biblioteca do Professor Asdrubal |\n'),
+	write('|---------------------------------|\n'),
+	write('|                                 |\n'),
+	write('| 1. Gerar e Resolver o Problema  |\n'),
+	write('| 2. Sair                         |\n'),
+	write('|                                 |\n'),
+	write('===================================\n'),
 	write('Escolha a opção pretendida:\t').
+print_info_geracao:-
+    write('\n ================== Menu de geração do problema ===================== \n'),
+	write('\n  |       De seguida tera a oportunidade de gerar                  | \n'),
+	write('\n  |       de forma aleatoria, definindo os limites                 | \n'),
+	write('\n  |       de cada parametro, as prateleiras disponiveis            | \n'),
+	write('\n  |       e os livros que devem ser distribuidos pelas mesmas.     | \n'),
+	write('\n  |       Cuidado, os valores mínimos nao podem ultrapassar os     | \n'),
+	write('\n  |       valores máximos para cada parametro, se o fizer será     | \n'),
+	write('\n  |       enviado de volta para o  menu principal.                 | \n'),
+	write('\n =================================================================== \n'),
+	pff_enter,
+	limpa. 	
+
+fazer_prateleiras:-
+	write('\n ========= Gerador de Prateleiras ========== \n'),
+	write('\n Por favor indique quantas prateleiras deseja gerar: \n'),
+	input_int(P_Input1),
+	write('\n Sobre as prateleiras, por favor, indique: \n'),
+	write('\n A largura mínima desejada: \n'),
+	input_int(P_Input2),
+	write('\n A largura máxima desejada: \n'),
+	input_int(P_Input3),
+	limit_handler(P_Input2, P_Input3),
+	write('\n A altura mínima permitida: \n'),
+	input_int(P_Input4),
+	write('\n A altura máxima pretendida:  \n'),
+	input_int(P_Input5),
+	limit_handler(P_Input4, P_Input5),
+	write('\n O preço mínimo permitido:  \n'),
+	input_int(P_Input6),
+	write('\n O preço máximo pretendido:  \n'),
+	input_int(P_Input7),
+	limit_handler(P_Input6, P_Input7),
+	gerador_prateleiras(P_Input1, P_Input2, P_Input3, P_Input4, P_Input5, P_Input6, P_Input7), %Por implementar :: P1-> Numero de prateleiras, Intervalo para as larguras -> [P2, P3], Intervalo para as alturas -> [P4, P5], Intervalo para os preços -> [P6, P7]
+	limpa.
+
+fazer_livros:-
+	write('\n ========= Gerador de Livros ========== \n'),
+	write('\n Por favor indique quantos livros deseja gerar: \n'),
+	input_int(L_Input1),
+	write('\n Sobre os livros a serem gerados, por favor, indique: \n'),
+	write('\n A largura mínima desejada: \n'),
+	input_int(L_Input2),
+	write('\n A largura máxima desejada: \n'),
+	input_int(L_Input3),
+	limit_handler(L_Input2, L_Input3),
+	write('\n A altura mínima permitida: \n'),
+	input_int(L_Input4),
+	write('\n A altura máxima pretendida:  \n'),
+	input_int(L_Input5),
+	limit_handler(L_Input4, L_Input5),
+	gerador_livros(L_Input1, L_Input2, L_Input3, L_Input4, L_Input5), %Por implementar :: L1-> Numero de livros, Intervalo para as larguras -> [L2, L3], Intervalo para as alturas -> [L4, L5] 
+	limpa.
 %Menus -> Fim
 
 
@@ -174,54 +227,60 @@ teste :-
 				  [3, 3, 4, 2, 4, 6, 3, 1], % altura dos livros
 				  [4, 2, 1, 3, 4 ,3 ,2, 4], %tema dos livros
 				  [1991, 2002, 2010, 2003, 2007, 2006, 1999, 1991],% ano de publicação dos livros
-				  DinheiroGasto, QuantidadeDasPrateleirasCompradas, ListaDosLivrosDispostosEmCadaPrateleiraComprada).
+				  DinheiroGasto, QuantidadeDasPrateleirasCompradas, ListaLivrosDispostosEmCadaPrateleiraComprada).
 				  %Espera-se obter:
 				  %DinheiroGasto = 10
 				  %QuantidadeDasPrateleirasCompradas = [0, 0, 1, 1, 0]
-				  %ListaDosLivrosDispostosEmCadaPrateleiraComprada = [ 3-[3,7,2,4,6], 4-[1,8,5] ]
+				  %ListaLivrosDispostosEmCadaPrateleiraComprada = [ 3-[3,7,2,4,6], 4-[1,8,5] ]
 				  %																  OU  4-[8,1,5]
 		
 
 %O predicado principal para resolver o problema terá a seguinte estrutura:
-% 				asdrubal(+CustosDasPrateleiras, +LargurasDasPrateleiras, +AlturasDasPrateleiras, +EstoqueDasPrateleiras, 
-%						 +LargurasDosLivros, +AlturasDosLivros, +TemasDosLivros, +DataDePubDosLivros,
-%						 -DinheiroGasto, -QuantidadeDasPrateleirasCompradas, -ListaDosLivrosDispostosEmCadaPrateleiraComprada).
+% 				asdrubal(+CustosPrateleiras, +LargurasPrateleiras, +AlturasPrateleiras, +EstoquePrateleiras, 
+%						 +LargurasLivros, +AlturasLivros, +TemasLivros, +DataDePubLivros,
+%						 -DinheiroGasto, -QuantidadeDasPrateleirasCompradas, -ListaLivrosDispostosEmCadaPrateleiraComprada).
 
-asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, EstoqueDasPrateleiras, 
-		 LargurasDosLivros, AlturasDosLivros, TemasDosLivros, DataDePubDosLivros,
-		 DinheiroGasto, QuantidadesDasPrateleirasCompradas, ListaDosLivrosDispostosEmCadaPrateleiraComprada) :- 
+asdrubal(CustosPrateleiras, LargurasPrateleiras, AlturasPrateleiras, EstoquePrateleiras, 
+		 LargurasLivros, AlturasLivros, TemasLivros, DataDePubLivros,
+		 DinheiroGasto, QtdsPrateleirasCompradas, ListaLivrosDispostosEmCadaPrateleiraComprada) :- 
 		 
 				statistics(walltime, [Start,_]),
 				
 				%Listas de entrada das prateleiras tem que ser do mesmo tamanho
-				length(CustosDasPrateleiras, QtdeTotalPrateleiras), length(LargurasDasPrateleiras, QtdeTotalPrateleiras),
-				length(AlturasDasPrateleiras, QtdeTotalPrateleiras), length(EstoqueDasPrateleiras, QtdeTotalPrateleiras),
-				length(QuantidadesDasPrateleirasCompradas, QtdeTotalPrateleiras),
+				length(CustosPrateleiras, QtdeTotalPrateleiras), length(LargurasPrateleiras, QtdeTotalPrateleiras),
+				length(AlturasPrateleiras, QtdeTotalPrateleiras), length(EstoquePrateleiras, QtdeTotalPrateleiras),
+				length(QtdsPrateleirasCompradas, QtdeTotalPrateleiras),
 				
 				%Listas de entrada dos livros tem que ser do mesmo tamanho
-				length(LargurasDosLivros, QtdeTotaldeLivros), length(AlturasDosLivros, QtdeTotaldeLivros),
-				length(TemasDosLivros, QtdeTotaldeLivros), length(DataDePubDosLivros, QtdeTotaldeLivros),
+				length(LargurasLivros, QtdeTotalLivros), length(AlturasLivros, QtdeTotalLivros),
+				length(TemasLivros, QtdeTotalLivros), length(DataDePubLivros, QtdeTotalLivros),
 				
 				
 				%Dominio das Variáveis de output
-				dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, QtdeTotalPrateleiras),
+				dominioPrateleirasCompradas(QtdsPrateleirasCompradas, EstoquePrateleiras, QtdeTotalPrateleiras),
+			
 				
+				%O tamanho de ListaLivrosDispostosEmCadaPrateleiraComprada tem que ser igual a quantidade de prateleiras compradas
+				sum(QtdsPrateleirasCompradas, #=, TotalPrateleirasCompradas),
+				length(ListaLivrosDispostosEmCadaPrateleiraComprada, TotalPrateleirasCompradas),
 				
-				%O tamanho de ListaDosLivrosDispostosEmCadaPrateleiraComprada tem que ser igual a quantidade de prateleiras compradas
-				sum(QuantidadesDasPrateleirasCompradas, #=, QtdeDasPrateleirasCompradas),
-				length(ListaDosLivrosDispostosEmCadaPrateleiraComprada, QtdeDasPrateleirasCompradas),
-				
-				%Altura do livro mais alto de um dado tema será o primeiro factor restritivo para a aquisição da prateleira correspondente
-				%Somatório das larguras dos livros definem o comprimento de prateleira necessário, sendo que se deve comparar o preço de 1 que tenha o comprimento necessário com a soma de N prateleiras mais pequenas que juntas cheguem para arrumar os lvros
-				%Por outro lado, se uma prateleira não for ocupada na totalidade, o espaço que resta deve ser tratado como uma "nova" prateleira de custo 0 vs Fazer a relação de preço/comprimento para definir o custo da "nova" sendo este subtraído ao da prateleira "Mãe" -> dependerá do professor
-				
+
+				dominioListaLivrosDispostosEmCadaPrateleiraComprada(ListaLivrosDispostosEmCadaPrateleiraComprada,
+																		QtdeTotalLivros, QtdsPrateleirasCompradas,
+																		LargurasPrateleiras, AlturasPrateleiras,
+																		LargurasLivros, AlturasLivros),
 		
 				%Determinar o dinheiro gasto nas compras
-				scalar_product(CustosDasPrateleiras, QuantidadesDasPrateleirasCompradas, #=, DinheiroGasto),
+				scalar_product(CustosPrateleiras, QtdsPrateleirasCompradas, #=, DinheiroGasto),
 				
+				
+				%colocaLivrosNasPrateleiras(ListaLivrosDispostosEmCadaPrateleiraComprada,
+				%							),
+				
+
 				%Pesquisa no labeling
-				append([DinheiroGasto], QuantidadesDasPrateleirasCompradas, VarsTmp),
-				append(VarsTmp, ListaDosLivrosDispostosEmCadaPrateleiraComprada, Vars),
+				append([DinheiroGasto], QtdsPrateleirasCompradas, VarsTmp),
+				append(VarsTmp, ListaLivrosDispostosEmCadaPrateleiraComprada, Vars),
 				labeling([minimize(DinheiroGasto)], Vars),
 				
 				%Tempo medido para encontrar a solução
@@ -233,12 +292,69 @@ asdrubal(CustosDasPrateleiras, LargurasDasPrateleiras, AlturasDasPrateleiras, Es
 		
 %A quantidade comprada de cada prateleira varia entre 0 e o estoque máximo daquele tipo de prateleira		
 dominioPrateleirasCompradas( _, _, 0).
-dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, Indice) :- 
-								element(Indice, EstoqueDasPrateleiras, QtdeEstoque),
-								element(Indice, QuantidadesDasPrateleirasCompradas, QtdeComprada),
+dominioPrateleirasCompradas(QtdsPrateleirasCompradas, EstoquePrateleiras, Indice) :- 
+								element(Indice, EstoquePrateleiras, QtdeEstoque),
+								element(Indice, QtdsPrateleirasCompradas, QtdeComprada),
 								domain([QtdeComprada], 0, QtdeEstoque),
 								NovoIndice is Indice - 1,
-								dominioPrateleirasCompradas(QuantidadesDasPrateleirasCompradas, EstoqueDasPrateleiras, NovoIndice).
+								dominioPrateleirasCompradas(QtdsPrateleirasCompradas, EstoquePrateleiras, NovoIndice).
 				
 				
+dominioListaLivrosDispostosEmCadaPrateleiraComprada( [IndicePrat-ListaLivrosDispostos | RestoDasPrateleiras],
+														QtdeTotalLivros, QtdsPrateleirasCompradas,
+														LargurasPrateleiras, AlturasPrateleiras,
+														LargurasLivros, AlturasLivros) :-
+																						element(IndicePrat, QtdsPrateleirasCompradas, Qtde),
+																						Qtde #\= 0, NovaQtde #= Qtde - 1,
+																						domain(ListaLivrosDispostos, 1, QtdeTotalLivros),
+																						all_distinct(ListaLivrosDispostos),
+																						element(IndicePrat, LargurasPrateleiras, LarguraPrat),
+																						element(IndicePrat, AlturasPrateleiras, AlturaPrat),
+																						restricaoLivrosDispostos(ListaLivrosDispostos,
+																												LargurasLivros, AlturasLivros,
+																												LarguraPrat, AlturaPrat),
+																						replaceElementInList( IndicePrat, QtdsPrateleirasCompradas, NovaQtde, NovaQtdsPrateleirasCompradas),
+																						dominioListaLivrosDispostosEmCadaPrateleiraComprada( RestoDasPrateleiras, QtdeTotalLivros, NovaQtdsPrateleirasCompradas,
+																																			LargurasPrateleiras, AlturasPrateleiras, LargurasLivros, AlturasLivros).
+																						
+dominioListaLivrosDispostosEmCadaPrateleiraComprada( [], _, _, _, _, _, _).
 
+%Substitui um element de um determinado indice por outro valor
+%    replaceElementInList(+Indice, +Lista, +NovoElemento, -NovaLista)
+replaceElementInList(Indice, Lista, NovoElemento, NovaLista) :- replaceElementInList(Indice, Lista, NovoElemento, NovaLista, 1).
+
+replaceElementInList(Indice, [Elem | Resto1], NovoElemento, [Elem | Resto2], AcumuladorIndice) :-
+												Indice #\= AcumuladorIndice,
+												NovoAcumuladorIndice #= AcumuladorIndice + 1,
+												replaceElementInList(Indice, Resto1, NovoElemento, Resto2, NovoAcumuladorIndice).
+
+replaceElementInList(Indice, [_Elem | Resto1], NovoElemento, [NovoElemento | Resto2], AcumuladorIndice) :-
+												Indice #= AcumuladorIndice,
+												NovoAcumuladorIndice #= AcumuladorIndice + 1,
+												replaceElementInList(Indice, Resto1, NovoElemento, Resto2, NovoAcumuladorIndice).
+
+replaceElementInList(_, [], _, [], _).
+
+
+%Restricao de largura e altura dos livros dispostos neste prateleira
+restricaoLivrosDispostos(ListaLivrosDispostos, LargurasLivros, AlturasLivros, LarguraPrat, AlturaPrat) :-
+												restringirLargura(ListaLivrosDispostos, LargurasLivros, LarguraPrat, 0),
+												restringirAltura(ListaLivrosDispostos, AlturasLivros, AlturaPrat).
+
+
+%Total da largura ocupada pelos livros tem que ser menor ou igual a largura da prateleira
+restringirLargura( [IndiceLivro | RestoLivros], LargurasLivros, LarguraPrat, AcumuladorLarg) :-
+															AcumuladorLarg	#=< LarguraPrat,
+															element(IndiceLivro, LargurasLivros, LarguraLiv),
+															NovoAcumuladorLarg #= AcumuladorLarg + LarguraLiv,
+															restringirLargura( RestoLivros, LargurasLivros, LarguraPrat, NovoAcumuladorLarg).
+
+restringirLargura( [], _, LarguraPrat, AcumuladorLarg) :- AcumuladorLarg #=< LarguraPrat
+
+%As alturas de todos os livros tem que ser menor ou igual a altura da prateleira
+restringirAltura( [IndiceLivro | RestoLivros], AlturasLivros, AlturaPrat) :-
+	element(IndiceLivro, AlturasLivros, AlturaLiv),
+	AlturaPrat #>= AlturaLiv,
+	restringirAltura( RestoLivros, AlturasLivros, AlturaPrat).
+
+restringirAltura([], _, _).
