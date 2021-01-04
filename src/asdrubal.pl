@@ -4,38 +4,6 @@
 :- use_module(library(file_systems)).
 
 
-/*
-%Sistema de Ficheiros -> para revisão 
-file_Path(FilePath):-
-    current_directory(Dir),
-    atom_concat(Dir, 'asdrubal.pl', FilePath).
-
-guardarLivros(Lista_Livros, Nome_Lista):-
-    file_Path(Path_Livros),
-    Term =.. [Nome_Lista, Lista_Livros],    
-    open(Path_Livros, append, Stream), 
-    write(Stream, '\n'),
-    write_term(Stream, Term, []), 
-    write(Stream, '.\n'), 
-    close(Stream),
-    write(Nome_Lista), write(' gravada com sucesso no directorio: '), write(Path_Livros), nl, nl,
-    reconsult(Path_Livros).
-
-guardarPrateleiras(Lista_Prateleiras, Nome_Lista):-
-    file_Path(Path_Prateleiras),
-    Term =.. [Nome_Lista, Lista_Prateleiras],    
-    open(Path_Livros, append, Stream), 
-    write(Stream, '\n'),
-    write_term(Stream, Term, []), 
-    write(Stream, '.\n'), 
-    close(Stream),
-    write(Nome_Lista), write(' gravada com sucesso no directorio: '), write(Path_Prateleiras), nl, nl,
-    reconsult(Path_Prateleiras).
-%Sistema de ficheiros -> Fim -> para revisão */
-
-
-%Guardar listas de livros e prateleiras usando asserta
-
 
 %Auxiliares para input handling
 %input_int(-Input) -> recebe um número de até 2 dígitos para input
@@ -51,12 +19,11 @@ input_int(Input):-
 aux_int( Char1, 10, Input):-
     Input is Char1 - 48.
 
-
-%prevenir contra a possibilidade de estar um \n na input Stream
+/*prevenir contra a possibilidade de estar um \n na input Stream
 aux_int( 10, Char2, Input):-
     write('\n So pa testar \t'),
     input_int(Input).
-
+*/
 
 
 %  caso de numero de 2 digitos
@@ -69,11 +36,44 @@ aux_int( Char1, Char2, Input):-
     Input is Temp + Digit2,
     get_char(_).
 
-%Handler para o menu principal que garante que os inputs de limite inferior não ultrapassamn os de limite superior
+
+
+input_int2(Input):-
+	get_code(Char1),
+    get_code(Char2),
+	Char1 > 47,
+	Char1 < 58,
+    aux_int(Char1, Char2, Input).
+
+% code do Char2 = 10 por exemplo '\n' ou seja, caso de numero de 1 digito
+aux_int2( Char1, 10, Input):-
+    Input is Char1 - 48.
+
+/*prevenir contra a possibilidade de estar um \n na input Stream
+aux_int( 10, Char2, Input):-
+    write('\n So pa testar \t'),
+    input_int(Input).
+*/
+
+
+%  caso de numero de 2 digitos
+aux_int2( Char1, Char2, Input):-
+	Char2 > 47,
+	Char2 < 58,
+    Digit1 is Char1 - 48,
+    Digit2 is Char2 - 48,
+    Temp is Digit1 * 10,
+    Input is Temp + Digit2,
+    get_char(_).
+
+
+%Handler para o menu principal que garante que os inputs de limite inferior não ultrapassamn os de limite superior 
+%causa bug de jumpto
 limit_handler(Inferior, Superior):-
 	Inferior < Superior -> ! ;
-	limit_handler(Inferior, Superior, NovoInf, NovoSup).
-
+	%limit_handler(Inferior, Superior, NovoInf, NovoSup).
+	write('seu maroto').
+/*
 limit_handler(Inferior, Superior, NovoInf, NovoSup):-
 	Inferior < Superior -> ! ;
 	Inferior > Superior,
@@ -88,7 +88,7 @@ limit_handler(Inferior, Superior, NovoInf, NovoSup):-
 	Superior is NovoSup,
 	limit_handler(NovoInf, NovoSup). 
 
-	
+	*/
 	
 	
 
@@ -130,27 +130,90 @@ pff_enter:-
 
 %Auxiliares de interface -> FIM
 %gerador de livros -> just for test atm
-gerador_livros(Input, Lista_Livros):-
-	guardarLivros( [[3, 1, 2, 2, 2, 1, 1, 1], 
-					[3, 3, 4, 2, 4, 6, 3, 1], 
-					[4, 2, 1, 3, 4 ,3 ,2, 4], 
-					[1991, 2002, 2010, 2003, 2007, 2006, 1999, 1991] ] , 'livros'),
-write('Por implementar \n ').
+gerador_livros(L_LarguraMin, L_LarguraMax, L_AlturaMin, L_AlturaMax, [], TemasLivros, LargurasLivros, AlturasLivros).
+gerador_livros(L_LarguraMin, L_LarguraMax, L_AlturaMin, L_AlturaMax,  H | T, TemasLivros, LargurasLivros, AlturasLivros):-
+	random(L_LarguraMin, L_LarguraMax , Largura),
+	append(Largura, LargurasLivros),
+	random(L_AlturaMin, L_AlturaMax, Altura),
+	append(Altura, AlturasLivros),
+	random(1, 9, Tema),
+	append(Tema, TemasLivros),
+	append(H, DtofLivros),
+	gerador_livros(L_Quantidade, L_LarguraMin, L_LarguraMax, L_AlturaMin, L_AlturaMax, T, TemasLivros, LargurasLivros, AlturasLivros).
+
+gera_DoP(Quantidade, L_DoP):-
+Quantidade = 0 -> ! ;
+					random(0, 99,Dop),
+					member(DoP, L_DoP) -> gera_DoP(Quantidade, L_DoP, DoP);
+										append(DoP, L_DoP),
+										NewQuantidade is Quantidade - 1,
+										gera_DoP(NewQuantidade, L_DoP).
+
+gera_DoP(Quantidade, L_DoP, LastRand):-
+Quantidade = 0 -> ! ;
+					NewRand is LastRand - abs(random(3, 9)),
+					random(NewRand, 99 ,DoP),
+					member(DoP, L_DoP) -> gera_DoP(Quantidade, L_DoP);
+										  append(DoP, L_DoP),
+										  NewQuantidade is Quantidade - 1,
+										  gera_DoP(NewQuantidade, L_DoP).
+
+
+gerador_prateleiras(Quantidade, P_LarguraMin, P_LarguraMax, P_AlturaMin, P_AlturaMax,MinPrice, MaxPrice, Stock, LargurasPrateleiras, AlturasPrateleiras, Precos, ListaPrateleiras):-
+	Quantidade #= 0 -> write(Precos), write(LargurasPrateleiras), write(AlturasPrateleiras), ListaPrateleirasAux = append (LargurasPrateleiras, AlturasPrateleiras, Aux), append(Precos, ListaPrateleirasAux, ListaPrateleiras) 
+						;
+						write('pass1'),
+		random(P_LarguraMin, P_LarguraMax, Largura), 
+		write('pass2'),
+		append([Largura], LargurasLivros, NewLarguras), % causa do erro "no"
+		write('pass3'),
+		random(P_AlturaMin, P_AlturaMax, Altura ),
+		append([Altura] , AlturasLivros, NewAlturas),
+		random(0, 3, Available),
+		append([Available], Stock, NewStock),
+		random(MinPrice, MaxPrice, Price),
+		append([Price], Precos, NewPrecos),
+		NewQuantidade is Quantidade - 1,
+		gerador_prateleiras(NewQuantidade, P_LarguraMin, P_LarguraMax, P_AlturaMin, P_AlturaMax,MinPrice, MaxPrice, NewStock, NewLarguras, NewAlturas, NewPrecos, ListaPrateleiras),
+		write('test gerador').
 
 
 
-gerador_prateleiras(Input, Lista_Prateleiras):-			
-	guardarPrateleiras([[3, 5, 6, 6, 1, 2], 
-						[3, 5, 6, 7, 6, 6], 
-						[6, 6, 6, 6, 10, 3],
-						[1, 2, 3, 1, 0, 1]	] , 'prateleiras'),
-write('Por implementar \n ').
-%geradores, test phase
+
+
+	
+
+
+gera_pID(Quantidade, L_pID):-
+Quantidade = 0 -> ! ;
+					random(0, 99 ,Pid),
+					member(Pid, P_pID) -> gera_Pid(Quantidade, L_pID, Pid);
+										append(Pid, L_pID),
+										NewQuantidade is Quantidade - 1,
+										gera_DoP(NewQuantidade, L_pID).
+
+gera_pID(Quantidade, L_pID, LastPid):-
+Quantidade = 0 -> ! ;
+					NewPid is LastPid - abs(random(2, 9)),
+					random(NewPid, 99 ,Pid),
+					member(Pid, L_pID) -> gera_DoP(Quantidade, L_pID);
+										  append(Pid, L_pID),
+										  NewQuantidade is Quantidade - 1,
+										  gera_DoP(NewQuantidade, L_pID).
+
+
+	
+	
+
+	 
+
+	
+
 
 
 menu_main:-          
 	print_main,
-	input_int(Input),
+	input_int2(Input),
 	main_option(Input).
 
 
@@ -168,11 +231,11 @@ main_option(2). %sair do programa
 	
 	
 %handler de inputs inválidos
-main_option(_):- 
+/*main_option(_):- 
 	write('\n Erro, a opção escolhida não é válida, escolha uma das opções disponíveis 1 ou 2. \n'),
 	pff_enter,
 	menu_main.
-
+*/
 
 print_main:-
 	limpa,
@@ -209,8 +272,9 @@ print_info_geracao:-
 fazer_prateleiras:-
     limpa,
 	write('\n ========= Gerador de Prateleiras ========== \n'),
-	write('\n Por favor indique quantas prateleiras deseja gerar: \t'),
+	write('\n Por favor indique quantos tipos de prateleiras deseja gerar: \t'),
 	input_int(P_Input1),
+	format(' escolheu ter ~w tipos de prateleira  ~n', P_Input1),
 	write('\n Sobre as prateleiras, por favor, indique: \n'),
 	write('\n A largura mínima desejada: \t'),
 	input_int(P_Input2),
@@ -218,18 +282,25 @@ fazer_prateleiras:-
 	write('\n A largura máxima desejada: \t'),
 	input_int(P_Input3),
 	format(' escolheu ~w como largura maxima ~n', P_Input3),
-	limit_handler(P_Input2, P_Input3),
-	write('\n A altura mínima permitida: \t'),
+	%limit_handler(P_Input2, P_Input3),
+	write('\n A altura minima permitida: \t'),
 	input_int(P_Input4),
+	format(' escolheu ~w como altura minima ~n', P_Input4),
 	write('\n A altura máxima pretendida:  \t'),
 	input_int(P_Input5),
-	limit_handler(P_Input4, P_Input5),
+	format(' escolheu ~w como altura maxima ~n', P_Input5),
+	%limit_handler(P_Input4, P_Input5),
 	write('\n O preço mínimo permitido:  \t'),
-	input_int(P_Input6),
+	input_int2(P_Input6),
+	format(' escolheu o preco minimo de ~w yangs ~n', P_Input6),
 	write('\n O preço máximo pretendido:  \t'),
-	input_int(P_Input7),
-	limit_handler(P_Input6, P_Input7),
-	%gerador_prateleiras(P_Input1, P_Input2, P_Input3, P_Input4, P_Input5, P_Input6, P_Input7), %Por implementar :: P1-> Numero de prateleiras, Intervalo para as larguras -> [P2, P3], Intervalo para as alturas -> [P4, P5], Intervalo para os preços -> [P6, P7]
+	input_int2(P_Input7),
+	format('escolheu o preco maximo de ~w yangs ~t ', P_Input7),
+	%limit_handler(P_Input6, P_Input7),
+	write('\n chekc2 \t'),
+	gerador_prateleiras(P_Input1, P_Input2, P_Input3, P_Input4, P_Input5, P_Input6, P_Input7, Stock, LargurasPrateleiras, AlturasPrateleiras, Precos, ListaPrateleiras),  %CUSTO, LARGURA, ALTURA, STOCK
+	write('\n chekc1 \t'),
+	write(ListaPrateleiras),
 	write('\n sucesso \t').
 
 fazer_livros:-
@@ -238,34 +309,44 @@ fazer_livros:-
 	write('\n Por favor indique quantos livros deseja gerar: \t'),
 	input_int(L_Input1),
 	write('\n Sobre os livros a serem gerados, por favor, indique: \n'),
-	write('\n A largura mínima desejada: \t'),
+	write('\n A largura minima desejada: \t'),
 	input_int(L_Input2),
+	format(' escolheu ~w como largura minima ~n', L_Input2),
 	write('\n A largura máxima desejada: \t'),
 	input_int(L_Input3),
+	format(' escolheu ~w como largura maxima ~n', L_Input3),
 	limit_handler(L_Input2, L_Input3),
-	write('\n A altura mínima permitida: \t'),
+	write('\n A altura minima permitida: \t'),
 	input_int(L_Input4),
-	write('\n A altura máxima pretendida:  \t'),
+	format(' escolheu ~w como altura minima ~n', L_Input4),
+	write('\n A altura maxima pretendida:  \t'),
 	input_int(L_Input5),
+	format(' escolheu ~w como altura maxima ~n', P_Input5),
 	limit_handler(L_Input4, L_Input5),
-	%gerador_livros(L_Input1, L_Input2, L_Input3, L_Input4, L_Input5), %Por implementar :: L1-> Numero de livros, Intervalo para as larguras -> [L2, L3], Intervalo para as alturas -> [L4, L5] 
+	gera_DoP(L_Input1, L_DoP), 
+	gerador_livros(L_Input2, L_Input3, L_Input4, L_DoP, TemasLivros, LargurasLivros, AlturasLivros), %LARGURA, ALTURA, TEMA, DOP
+	ListaLivrosOG = [LargurasLivros, AlturasLivros, TemasLivros, L_DoP],
+	write(ListaLivrosOG),
 	write('\n sucesso \t').
 
 %Menus -> Fim
 
 
 
+
 teste :-
-		asdrubal( [3, 5, 6, 6, 1, 2], %custo de cada prateleira
+		asdrubal( [3, 5, 6, 6, 1, 2], %custo de cada prateleira %CUSTO, LARGURA, ALTURA, STOCK
 				  [3, 5, 6, 7, 6, 6], %largura de cada prateleira
 				  [6, 6, 6, 6, 10, 3], %altura de cada prateleira
 				  [1, 2, 3, 1, 0, 1], %stock de cada
 				  %provavelmente será preciso adicionar um Unique_ID para cada livro e, talvez título
-				  [3, 1, 2, 2, 2, 1, 1, 1], %largura dos livros
+				  [3, 1, 2, 2, 2, 1, 1, 1], %largura dos livros %LARGURA, ALTURA, TEMA, DOP
 				  [3, 3, 4, 2, 4, 6, 3, 1], % altura dos livros
 				  [4, 2, 1, 3, 4 ,3 ,2, 4], %tema dos livros
-				  [1991, 2002, 2010, 2003, 2007, 2006, 1999, 1991],% ano de publicação dos livros
+				  [1991, 2002, 2010, 2003, 2007, 2006, 1999, 1991], % ano de publicação dos livros
 				  DinheiroGasto, QuantidadeDasPrateleirasCompradas, ListaLivrosDispostosEmCadaPrateleiraComprada).
+				  
+				  
 				  %Espera-se obter:
 				  %DinheiroGasto = 10
 				  %QuantidadeDasPrateleirasCompradas = [0, 0, 1, 1, 0]
@@ -308,6 +389,10 @@ asdrubal(CustosPrateleiras, LargurasPrateleiras, AlturasPrateleiras, EstoquePrat
 																		LargurasPrateleiras, AlturasPrateleiras,
 																		LargurasLivros, AlturasLivros),
 		
+
+
+
+
 				%Determinar o dinheiro gasto nas compras
 				scalar_product(CustosPrateleiras, QtdsPrateleirasCompradas, #=, DinheiroGasto),
 				
@@ -387,7 +472,7 @@ restringirLargura( [IndiceLivro | RestoLivros], LargurasLivros, LarguraPrat, Acu
 															NovoAcumuladorLarg #= AcumuladorLarg + LarguraLiv,
 															restringirLargura( RestoLivros, LargurasLivros, LarguraPrat, NovoAcumuladorLarg).
 
-restringirLargura( [], _, LarguraPrat, AcumuladorLarg) :- AcumuladorLarg #=< LarguraPrat
+restringirLargura( [], _, LarguraPrat, AcumuladorLarg) :- AcumuladorLarg #=< LarguraPrat.
 
 %As alturas de todos os livros tem que ser menor ou igual a altura da prateleira
 restringirAltura( [IndiceLivro | RestoLivros], AlturasLivros, AlturaPrat) :-
